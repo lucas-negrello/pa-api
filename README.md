@@ -1,66 +1,194 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Personal Assistent API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This is a Laravel-based API for Personal Assistance application, providing secure authentication and API functionality powered by Sanctum with Redis for caching and sessions.
 
-## About Laravel
+## Table of Contents
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Environment Variables](#environment-variables)
+- [Running the Project](#running-the-project)
+- [Database Migrations](#database-migrations)
+- [API Authentication](#api-authentication)
+- [Usage](#usage)
+- [Testing](#testing)
+- [Troubleshooting](#troubleshooting)
+- [Docker Configuration](#docker-configuration)
+- [Contributing](#contributing)
+- [License](#license)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Docker Configuration
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+The Docker setup is organized by environment and managed within the `.docker` folder. Each environment has a detailed README with configuration details:
 
-## Learning Laravel
+- [Development Configuration](.docker/development/README.md)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+This section covers Docker Compose, Dockerfile, Nginx, PHP, and other settings for each environment.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Requirements
+------------
 
-## Laravel Sponsors
+-   **Docker** and **Docker Compose** for containerized environment
+-   **PHP** (8.2), **PostgreSQL**, and **Redis** set up in Docker containers
+-   **Composer** for PHP dependencies
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Installation
+------------
 
-### Premium Partners
+1.  **Clone the Repository**:
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+    ```bash
+    git clone https://github.com/lucas-negrello/pa-api.git
+    cd pa-api
+    ```
 
-## Contributing
+2.  **Install PHP Dependencies**:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+    ```bash
+    composer install
+    ```
 
-## Code of Conduct
+3.  **Set Up Environment File**: Copy `.env.example` to `.env` and update configuration settings as needed.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+    ```bash
+    cp .env.example .env
+    ```
 
-## Security Vulnerabilities
+4.  **Generate Application Key**:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+    ```bash
+    php artisan key:generate
+    ```
 
-## License
+Environment Variables
+---------------------
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Configure the following variables in the `.env` file:
+
+
+```dotenv
+# Application Configuration
+APP_NAME=pa-api
+APP_ENV=local
+APP_KEY=base64:...
+APP_DEBUG=true
+APP_URL=http://localhost
+
+# Database Configuration
+DB_CONNECTION=pgsql
+DB_HOST=db
+DB_PORT=5432
+DB_DATABASE=pa-api
+DB_USERNAME=root
+DB_PASSWORD=password
+
+# Redis Configuration
+CACHE_DRIVER=redis
+SESSION_DRIVER=redis
+REDIS_HOST=redis
+REDIS_PORT=6379
+
+# Sanctum Configuration
+SANCTUM_STATEFUL_DOMAINS=localhost
+SESSION_DOMAIN=localhost
+```
+
+Running the Project
+-------------------
+
+1.  **Start the Containers**:
+
+    ```bash
+    docker-compose up --build -d
+    ```
+
+2.  **Run Migrations**: After starting the containers, migrate the database:
+
+    ```bash
+    docker exec app php artisan migrate
+    ```
+
+3.  **Check the Application**:
+
+    -   Access the API at: `http://localhost:{APP_PORT}` (default: 8084).
+    -   The API is served through Nginx and powered by PHP-FPM.
+
+Database Migrations
+-------------------
+
+To create or update the database schema, run migrations with:
+
+```bash
+docker-compose exec app php artisan migrate
+```
+
+To rollback the last migration, run:
+
+```bash
+docker-compose exec app php artisan rollback
+```
+
+API Authentication
+------------------
+
+This project uses **Laravel Sanctum** for token-based authentication.
+
+1.  **Register**: `POST /api/register` - Create a new user.
+2.  **Login**: `POST /api/login` - Log in and retrieve an access token.
+3.  **Logout**: `POST /api/logout` - Invalidate the user's access token.
+
+### Sample Request Headers for Protected Routes
+
+For routes protected by `auth:sanctum`, include the JWT token in the `Authorization` header:
+
+```http request
+Authorization: Bearer {token}
+```
+
+Usage
+-----
+
+[//]: # (1.  **Access User Profile**: `GET /api/user`)
+
+[//]: # (2.  **Add Telemetry Data**: `POST /api/telemetry` &#40;Protected route&#41;)
+
+[//]: # (3.  **Retrieve Telemetry Data**: `GET /api/telemetry` &#40;Protected route&#41;)
+
+[//]: # ()
+[//]: # (Additional routes and their details are available in the `routes/api.php` file.)
+
+Testing
+-------
+
+1.  **Run Tests**: Use PHPUnit to run tests within the Docker container:
+
+    ```bash
+    docker exec app php artisan test
+    ```
+
+2.  **API Testing**: Use tools like Postman or cURL to test API endpoints and ensure responses match expected output.
+
+Troubleshooting
+---------------
+
+-   **Database Connection Issues**:
+
+    -   Verify the `DB_HOST` and `DB_PORT` in the `.env` file and ensure they match the settings in `docker-compose.yml`.
+    -   Restart the containers with `docker-compose down && docker-compose up -d` if connection issues persist.
+-   **Redis Issues**:
+
+    -   Ensure `CACHE_DRIVER` and `SESSION_DRIVER` are both set to `redis` in `.env`.
+    -   Check Redis logs with `docker-compose logs redis` for any errors.
+
+Contributing
+------------
+
+Contributions are welcome! Please fork the repository and create a pull request with your changes. Follow the project's coding guidelines and ensure all new features are covered by tests.
+
+License
+-------
+
+This project is licensed under the MIT License. See the LICENSE file for more details.
