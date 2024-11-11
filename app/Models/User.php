@@ -47,4 +47,65 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function tasks()
+    {
+        return $this->hasMany(Task::class);
+    }
+
+    /**
+     * Get the shopping lists for the user.
+     */
+    public function shoppingLists()
+    {
+        return $this->hasMany(ShoppingList::class);
+    }
+
+    /**
+     * Get the appointments for the user.
+     */
+    public function appointments()
+    {
+        return $this->hasMany(Appointment::class);
+    }
+
+    /**
+     * Get the goals for the user.
+     */
+    public function goals()
+    {
+        return $this->hasMany(Goal::class);
+    }
+
+    /**
+     * Get the task permissions for the user.
+     */
+    public function taskPermissions()
+    {
+        return $this->hasMany(TaskPermission::class);
+    }
+
+    /**
+     * Get the shopping list permissions for the user.
+     */
+    public function shoppingListPermissions()
+    {
+        return $this->hasMany(ShoppingListPermission::class);
+    }
+
+    /**
+     * Get the appointment permissions for the user.
+     */
+    public function appointmentPermissions()
+    {
+        return $this->hasMany(AppointmentPermission::class);
+    }
+
+    /**
+     * Get the goal permissions for the user.
+     */
+    public function goalPermissions()
+    {
+        return $this->hasMany(GoalPermission::class);
+    }
 }
