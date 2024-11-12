@@ -17,12 +17,16 @@ class ShoppingList extends Model
         'due_date'
     ];
 
+    protected $with = [
+        'shoppingListItems'
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function items()
+    public function shoppingListItems()
     {
         return $this->hasMany(ShoppingListItem::class);
     }

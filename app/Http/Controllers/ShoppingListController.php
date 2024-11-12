@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use App\Http\Requests\StoreShoppingListRequest;
 use App\Http\Requests\UpdateShoppingListRequest;
 use App\Models\ShoppingList;
@@ -13,15 +14,8 @@ class ShoppingListController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        $shoppingLists = ShoppingList::all();
+        return response()->json($shoppingLists);
     }
 
     /**
@@ -29,7 +23,11 @@ class ShoppingListController extends Controller
      */
     public function store(StoreShoppingListRequest $request)
     {
-        //
+        $shoppingList = ShoppingList::create($request->validated());
+        return response()->json([
+            'message' => 'Successfully created shopping list',
+            'data' => $shoppingList
+        ], ResponseAlias::HTTP_CREATED );
     }
 
     /**
@@ -37,15 +35,10 @@ class ShoppingListController extends Controller
      */
     public function show(ShoppingList $shoppingList)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(ShoppingList $shoppingList)
-    {
-        //
+        return response()->json([
+            'message' => 'Successfully found a shopping list',
+            'data' => $shoppingList
+        ]);
     }
 
     /**
@@ -53,7 +46,11 @@ class ShoppingListController extends Controller
      */
     public function update(UpdateShoppingListRequest $request, ShoppingList $shoppingList)
     {
-        //
+        $shoppingList->update($request->validated());
+        return response()->json([
+            'message' => 'Successfully updated shopping list',
+            'data' => $shoppingList
+        ]);
     }
 
     /**
@@ -61,6 +58,10 @@ class ShoppingListController extends Controller
      */
     public function destroy(ShoppingList $shoppingList)
     {
-        //
+        $shoppingList->delete();
+        return response()->json([
+            'message' => 'Successfully deleted shopping list',
+            'data' => $shoppingList
+        ]);
     }
 }

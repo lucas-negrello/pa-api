@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreShoppingListItemRequest extends FormRequest
@@ -11,18 +12,22 @@ class StoreShoppingListItemRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array|string>
      */
     public function rules(): array
     {
         return [
-            //
+            'shopping_list_id' => ['required', 'exists:shopping_lists,id'],
+            'name' => ['required', 'string'],
+            'quantity' => ['required', 'integer', 'min:1'],
+            'unit' => ['nullable', 'string'],
+            'status' => ['nullable', 'string'],
         ];
     }
 }

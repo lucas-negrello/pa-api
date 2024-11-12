@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use App\Http\Requests\StoreShoppingListItemRequest;
 use App\Http\Requests\UpdateShoppingListItemRequest;
 use App\Models\ShoppingListItem;
@@ -13,15 +14,8 @@ class ShoppingListItemController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        $shoppingListItems = ShoppingListItem::all();
+        return response()->json($shoppingListItems);
     }
 
     /**
@@ -29,7 +23,12 @@ class ShoppingListItemController extends Controller
      */
     public function store(StoreShoppingListItemRequest $request)
     {
-        //
+        $shoppingListItem = ShoppingListItem::create($request->validated());
+        return response()->json([
+            'message' => 'ShoppingListItem created successfully',
+            'data' => $shoppingListItem,
+        ], ResponseAlias::HTTP_CREATED);
+
     }
 
     /**
@@ -37,15 +36,10 @@ class ShoppingListItemController extends Controller
      */
     public function show(ShoppingListItem $shoppingListItem)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(ShoppingListItem $shoppingListItem)
-    {
-        //
+        return response()->json([
+            'message' => 'ShoppingListItem retrieved successfully',
+            'data' => $shoppingListItem,
+        ]);
     }
 
     /**
@@ -53,7 +47,11 @@ class ShoppingListItemController extends Controller
      */
     public function update(UpdateShoppingListItemRequest $request, ShoppingListItem $shoppingListItem)
     {
-        //
+        $shoppingListItem->update($request->validated());
+        return response()->json([
+            'message' => 'ShoppingListItem updated successfully',
+            'data' => $shoppingListItem,
+        ]);
     }
 
     /**
@@ -61,6 +59,10 @@ class ShoppingListItemController extends Controller
      */
     public function destroy(ShoppingListItem $shoppingListItem)
     {
-        //
+        $shoppingListItem->delete();
+        return response()->json([
+            'message' => 'ShoppingListItem deleted successfully',
+            'data' => $shoppingListItem,
+        ]);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
 use App\Models\Task;
@@ -13,15 +14,8 @@ class TaskController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        $tasks = Task::all();
+        return response()->json($tasks);
     }
 
     /**
@@ -29,7 +23,11 @@ class TaskController extends Controller
      */
     public function store(StoreTaskRequest $request)
     {
-        //
+        $task = Task::create($request->validated());
+        return response()->json([
+            'message' => 'Task created successfully',
+            'data' => $task,
+        ], ResponseAlias::HTTP_CREATED);
     }
 
     /**
@@ -37,15 +35,10 @@ class TaskController extends Controller
      */
     public function show(Task $task)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Task $task)
-    {
-        //
+        return response()->json([
+            'message' => 'Task retrieved successfully',
+            'data' => $task,
+        ]);
     }
 
     /**
@@ -53,7 +46,11 @@ class TaskController extends Controller
      */
     public function update(UpdateTaskRequest $request, Task $task)
     {
-        //
+        $task->update($request->validated());
+        return response()->json([
+            'message' => 'Task updated successfully',
+            'data' => $task,
+        ]);
     }
 
     /**
@@ -61,6 +58,10 @@ class TaskController extends Controller
      */
     public function destroy(Task $task)
     {
-        //
+        $task->delete();
+        return response()->json([
+            'message' => 'Task deleted successfully',
+            'data' => $task,
+        ]);
     }
 }

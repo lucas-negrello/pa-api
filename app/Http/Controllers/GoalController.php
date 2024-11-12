@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use App\Http\Requests\StoreGoalRequest;
 use App\Http\Requests\UpdateGoalRequest;
 use App\Models\Goal;
@@ -13,15 +14,8 @@ class GoalController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        $goals = Goal::all();
+        return response()->json($goals);
     }
 
     /**
@@ -29,7 +23,11 @@ class GoalController extends Controller
      */
     public function store(StoreGoalRequest $request)
     {
-        //
+        $goal = Goal::create($request->validated());
+        return response()->json([
+            'message' => 'Goal created',
+            'data' => $goal
+        ], ResponseAlias::HTTP_CREATED);
     }
 
     /**
@@ -37,15 +35,10 @@ class GoalController extends Controller
      */
     public function show(Goal $goal)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Goal $goal)
-    {
-        //
+        return response()->json([
+            'message' => 'Goal retrieved',
+            'data' => $goal
+        ]);
     }
 
     /**
@@ -53,7 +46,11 @@ class GoalController extends Controller
      */
     public function update(UpdateGoalRequest $request, Goal $goal)
     {
-        //
+        $goal->update($request->validated());
+        return response()->json([
+            'message' => 'Goal updated',
+            'data' => $goal
+        ]);
     }
 
     /**
@@ -61,6 +58,10 @@ class GoalController extends Controller
      */
     public function destroy(Goal $goal)
     {
-        //
+        $goal->delete();
+        return response()->json([
+            'message' => 'Goal deleted',
+            'data' => $goal
+        ]);
     }
 }

@@ -35,6 +35,13 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected $with = [
+        'tasks',
+        'shoppingLists',
+        'appointments',
+        'goals',
+    ];
+
     /**
      * Get the attributes that should be cast.
      *

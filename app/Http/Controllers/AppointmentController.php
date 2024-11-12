@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use App\Http\Requests\StoreAppointmentRequest;
 use App\Http\Requests\UpdateAppointmentRequest;
 use App\Models\Appointment;
@@ -13,15 +14,8 @@ class AppointmentController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        $appointments = Appointment::all();
+        return response()->json($appointments);
     }
 
     /**
@@ -29,7 +23,11 @@ class AppointmentController extends Controller
      */
     public function store(StoreAppointmentRequest $request)
     {
-        //
+        $appointment = Appointment::create($request->validated());
+        return response()->json([
+            'message' => 'Appointment created successfully',
+            'data' => $appointment,
+        ], ResponseAlias::HTTP_CREATED);
     }
 
     /**
@@ -37,15 +35,10 @@ class AppointmentController extends Controller
      */
     public function show(Appointment $appointment)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Appointment $appointment)
-    {
-        //
+        return response()->json([
+            'message' => 'Appointment retrieved successfully',
+            'data' => $appointment,
+        ]);
     }
 
     /**
@@ -53,7 +46,11 @@ class AppointmentController extends Controller
      */
     public function update(UpdateAppointmentRequest $request, Appointment $appointment)
     {
-        //
+        $appointment->update($request->validated());
+        return response()->json([
+            'message' => 'Appointment updated successfully',
+            'data' => $appointment,
+        ]);
     }
 
     /**
@@ -61,6 +58,10 @@ class AppointmentController extends Controller
      */
     public function destroy(Appointment $appointment)
     {
-        //
+        $appointment->delete();
+        return response()->json([
+            'message' => 'Appointment deleted successfully',
+            'data' => $appointment,
+        ]);
     }
 }
