@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Permission;
+use App\Models\Role;
 use App\Models\User;
 use App\Notifications\Mail\MailVerifyNotification;
 use Illuminate\Auth\Events\Verified;
@@ -24,6 +26,10 @@ class VerificationController extends Controller
         if ($user->hasVerifiedEmail()) {
             return response()->json(['message' => 'Email has already been verified.']);
         }
+
+        $adminRole = Role::where('name', 'admin')->first();
+        $user->roles()->syncWithoutDetaching($adminRole);
+        HandlePermissions::grantPermissionToOwnResources($user);
 
         $user->update(['active' => true]);
 

@@ -7,6 +7,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -44,7 +45,8 @@ class User extends Authenticatable
         'appointments',
         'goals',
         'roles',
-        'permissions'
+        'permissions',
+        'sharedPermissions'
     ];
 
     /**
@@ -98,26 +100,42 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id')
         ->withTimestamps()->with('permissions');
-
     }
 
-    public function hasPermission($permission): bool
+    // TODO - ESSA RELACAO ESTA RESULTANDO EM ALGO ESTRANHO (GERA UM SHARED ERRADO)
+    public function sharedPermissions(): MorphMany
     {
-        return $this->roles()->whereHas('permissions', function ($query) use ($permission) {
+        return $this->morphMany(UserUser::class, 'resource');
+    }
+
+    public function hasPermission($permission, $resource = null): bool
+    {
+        $hasGlobalPermission = $this->roles()->whereHas('permissions', function ($query) use ($permission) {
             $query->where('name', $permission);
         })->exists();
+
+        if($hasGlobalPermission){
+            return true;
+        }
+
+        if ($resource) {
+            return $this->sharedPermissions()
+                ->where('granted_user_id', $this->id)
+                ->where('resource_id', $resource->id)
+                ->where('resource_type', get_class($resource))
+                ->whereHas('permission', function ($query) use ($permission) {
+                    $query->where('name', $permission);
+                })
+                ->exists();
+        }
+
+        return false;
     }
 
 
     public function hasRole(string $role)
     {
         return $this->roles->contains('name', $role);
-    }
-
-    public function assignRole(string $role)
-    {
-        $role = Role::where('name', $role)->firstOrFail();
-        $this->roles()->syncWithoutDetaching($role);
     }
 
 }

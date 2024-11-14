@@ -9,6 +9,7 @@ use App\Http\Controllers\ShoppingListController;
 use App\Http\Controllers\ShoppingListItemController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\VerificationController;
+use \App\Http\Controllers\HandlePermissions;
 use App\Http\Middleware\LogLoginAttempts;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -48,6 +49,8 @@ Route::prefix('v1')->group(function () {
         Route::resource('/shoppingListItems', ShoppingListItemController::class)->parameter('','shoppingListItem');
         Route::resource('/tasks', TaskController::class)->parameter('','task');
 
+        // PERMISSION ROUTES
+        Route::post('/permission/give/{user_id}/{granted_user_id}', [HandlePermissions::class, 'grantPermissionsToAnotherUser']);
     });
 });
 
