@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
@@ -14,6 +15,8 @@ class TaskController extends Controller
      */
     public function index()
     {
+        Gate::authorize('viewAny', Task::class);
+
         $tasks = Task::all();
         return response()->json($tasks);
     }
@@ -23,6 +26,8 @@ class TaskController extends Controller
      */
     public function store(StoreTaskRequest $request)
     {
+        Gate::authorize('create', Task::class);
+
         $task = Task::create($request->validated());
         return response()->json([
             'message' => 'Task created successfully',
@@ -35,6 +40,8 @@ class TaskController extends Controller
      */
     public function show(Task $task)
     {
+        Gate::authorize('view', Task::class);
+
         return response()->json([
             'message' => 'Task retrieved successfully',
             'data' => $task,
@@ -46,6 +53,8 @@ class TaskController extends Controller
      */
     public function update(UpdateTaskRequest $request, Task $task)
     {
+        Gate::authorize('update', Task::class);
+
         $task->update($request->validated());
         return response()->json([
             'message' => 'Task updated successfully',
@@ -58,6 +67,8 @@ class TaskController extends Controller
      */
     public function destroy(Task $task)
     {
+        Gate::authorize('destroy', Task::class);
+
         $task->delete();
         return response()->json([
             'message' => 'Task deleted successfully',

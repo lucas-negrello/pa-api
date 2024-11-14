@@ -13,7 +13,8 @@ class ShoppingListPolicy
      */
     public function viewAny(User $user): bool
     {
-        //
+        return $user->hasPermission('view-any-shopping-list');
+
     }
 
     /**
@@ -21,7 +22,8 @@ class ShoppingListPolicy
      */
     public function view(User $user, ShoppingList $shoppingList): bool
     {
-        //
+        return $user->hasPermission('view-shopping-list');
+
     }
 
     /**
@@ -29,7 +31,8 @@ class ShoppingListPolicy
      */
     public function create(User $user): bool
     {
-        //
+        return $user->hasPermission('create-shopping-list');
+
     }
 
     /**
@@ -37,7 +40,8 @@ class ShoppingListPolicy
      */
     public function update(User $user, ShoppingList $shoppingList): bool
     {
-        //
+        return $user->hasPermission('update-shopping-list');
+
     }
 
     /**
@@ -45,7 +49,8 @@ class ShoppingListPolicy
      */
     public function delete(User $user, ShoppingList $shoppingList): bool
     {
-        //
+        return $user->hasPermission('delete-shopping-list');
+
     }
 
     /**
@@ -53,7 +58,8 @@ class ShoppingListPolicy
      */
     public function restore(User $user, ShoppingList $shoppingList): bool
     {
-        //
+        return $user->hasPermission('restore-shopping-list');
+
     }
 
     /**
@@ -61,6 +67,7 @@ class ShoppingListPolicy
      */
     public function forceDelete(User $user, ShoppingList $shoppingList): bool
     {
-        //
+        return $user->hasPermission('force-delete-shopping-list');
+
     }
 }

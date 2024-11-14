@@ -13,7 +13,8 @@ class GoalPolicy
      */
     public function viewAny(User $user): bool
     {
-        //
+        return $user->hasPermission('view-any-goal');
+
     }
 
     /**
@@ -21,7 +22,8 @@ class GoalPolicy
      */
     public function view(User $user, Goal $goal): bool
     {
-        //
+        return $user->hasPermission('view-goal');
+
     }
 
     /**
@@ -29,7 +31,8 @@ class GoalPolicy
      */
     public function create(User $user): bool
     {
-        //
+        return $user->hasPermission('create-goal');
+
     }
 
     /**
@@ -37,7 +40,8 @@ class GoalPolicy
      */
     public function update(User $user, Goal $goal): bool
     {
-        //
+        return $user->hasPermission('update-goal');
+
     }
 
     /**
@@ -45,7 +49,8 @@ class GoalPolicy
      */
     public function delete(User $user, Goal $goal): bool
     {
-        //
+        return $user->hasPermission('delete-goal');
+
     }
 
     /**
@@ -53,7 +58,8 @@ class GoalPolicy
      */
     public function restore(User $user, Goal $goal): bool
     {
-        //
+        return $user->hasPermission('restore-goal');
+
     }
 
     /**
@@ -61,6 +67,7 @@ class GoalPolicy
      */
     public function forceDelete(User $user, Goal $goal): bool
     {
-        //
+        return $user->hasPermission('force-delete-goal');
+
     }
 }

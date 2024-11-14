@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use App\Http\Requests\StoreAppointmentRequest;
 use App\Http\Requests\UpdateAppointmentRequest;
@@ -14,6 +15,8 @@ class AppointmentController extends Controller
      */
     public function index()
     {
+        Gate::authorize('viewAny', Appointment::class);
+
         $appointments = Appointment::all();
         return response()->json($appointments);
     }
@@ -23,6 +26,8 @@ class AppointmentController extends Controller
      */
     public function store(StoreAppointmentRequest $request)
     {
+        Gate::authorize('create', Appointment::class);
+
         $appointment = Appointment::create($request->validated());
         return response()->json([
             'message' => 'Appointment created successfully',
@@ -35,6 +40,8 @@ class AppointmentController extends Controller
      */
     public function show(Appointment $appointment)
     {
+        Gate::authorize('view', Appointment::class);
+
         return response()->json([
             'message' => 'Appointment retrieved successfully',
             'data' => $appointment,

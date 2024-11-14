@@ -30,9 +30,4 @@ class ShoppingList extends Model
     {
         return $this->hasMany(ShoppingListItem::class);
     }
-
-    public function permissions()
-    {
-        return $this->hasMany(ShoppingListPermission::class);
-    }
 }

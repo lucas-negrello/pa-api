@@ -39,9 +39,4 @@ class Goal extends Model
     {
         return $this->belongsTo(User::class);
     }
-
-    public function permissions()
-    {
-        return $this->hasMany(GoalPermission::class);
-    }
 }

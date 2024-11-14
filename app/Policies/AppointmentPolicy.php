@@ -13,7 +13,8 @@ class AppointmentPolicy
      */
     public function viewAny(User $user): bool
     {
-        //
+        return $user->hasPermission('view-any-appointment');
+
     }
 
     /**
@@ -21,7 +22,8 @@ class AppointmentPolicy
      */
     public function view(User $user, Appointment $appointment): bool
     {
-        //
+        return $user->hasPermission('view-appointment');
+
     }
 
     /**
@@ -29,7 +31,8 @@ class AppointmentPolicy
      */
     public function create(User $user): bool
     {
-        //
+        return $user->hasPermission('create-appointment');
+
     }
 
     /**
@@ -37,7 +40,8 @@ class AppointmentPolicy
      */
     public function update(User $user, Appointment $appointment): bool
     {
-        //
+        return $user->hasPermission('update-appointment');
+
     }
 
     /**
@@ -45,7 +49,8 @@ class AppointmentPolicy
      */
     public function delete(User $user, Appointment $appointment): bool
     {
-        //
+        return $user->hasPermission('delete-appointment');
+
     }
 
     /**
@@ -53,7 +58,8 @@ class AppointmentPolicy
      */
     public function restore(User $user, Appointment $appointment): bool
     {
-        //
+        return $user->hasPermission('restore-appointment');
+
     }
 
     /**
@@ -61,6 +67,7 @@ class AppointmentPolicy
      */
     public function forceDelete(User $user, Appointment $appointment): bool
     {
-        //
+        return $user->hasPermission('force-delete-appointment');
+
     }
 }

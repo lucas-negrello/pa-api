@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use App\Http\Requests\StoreGoalRequest;
 use App\Http\Requests\UpdateGoalRequest;
@@ -14,6 +15,8 @@ class GoalController extends Controller
      */
     public function index()
     {
+        Gate::authorize('viewAny', Goal::class);
+
         $goals = Goal::all();
         return response()->json($goals);
     }
@@ -23,6 +26,8 @@ class GoalController extends Controller
      */
     public function store(StoreGoalRequest $request)
     {
+        Gate::authorize('create', Goal::class);
+
         $goal = Goal::create($request->validated());
         return response()->json([
             'message' => 'Goal created',
@@ -35,6 +40,8 @@ class GoalController extends Controller
      */
     public function show(Goal $goal)
     {
+        Gate::authorize('view', Goal::class);
+
         return response()->json([
             'message' => 'Goal retrieved',
             'data' => $goal
@@ -46,6 +53,8 @@ class GoalController extends Controller
      */
     public function update(UpdateGoalRequest $request, Goal $goal)
     {
+        Gate::authorize('update', Goal::class);
+
         $goal->update($request->validated());
         return response()->json([
             'message' => 'Goal updated',
@@ -58,6 +67,8 @@ class GoalController extends Controller
      */
     public function destroy(Goal $goal)
     {
+        Gate::authorize('delete', Goal::class);
+
         $goal->delete();
         return response()->json([
             'message' => 'Goal deleted',

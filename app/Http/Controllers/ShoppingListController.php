@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use App\Http\Requests\StoreShoppingListRequest;
 use App\Http\Requests\UpdateShoppingListRequest;
@@ -14,6 +15,8 @@ class ShoppingListController extends Controller
      */
     public function index()
     {
+        Gate::authorize('viewAny', ShoppingList::class);
+
         $shoppingLists = ShoppingList::all();
         return response()->json($shoppingLists);
     }
@@ -23,6 +26,8 @@ class ShoppingListController extends Controller
      */
     public function store(StoreShoppingListRequest $request)
     {
+        Gate::authorize('create', ShoppingList::class);
+
         $shoppingList = ShoppingList::create($request->validated());
         return response()->json([
             'message' => 'Successfully created shopping list',
@@ -35,6 +40,8 @@ class ShoppingListController extends Controller
      */
     public function show(ShoppingList $shoppingList)
     {
+        Gate::authorize('view', ShoppingList::class);
+
         return response()->json([
             'message' => 'Successfully found a shopping list',
             'data' => $shoppingList
@@ -46,6 +53,8 @@ class ShoppingListController extends Controller
      */
     public function update(UpdateShoppingListRequest $request, ShoppingList $shoppingList)
     {
+        Gate::authorize('update', ShoppingList::class);
+
         $shoppingList->update($request->validated());
         return response()->json([
             'message' => 'Successfully updated shopping list',
@@ -58,6 +67,8 @@ class ShoppingListController extends Controller
      */
     public function destroy(ShoppingList $shoppingList)
     {
+        Gate::authorize('delete', ShoppingList::class);
+
         $shoppingList->delete();
         return response()->json([
             'message' => 'Successfully deleted shopping list',

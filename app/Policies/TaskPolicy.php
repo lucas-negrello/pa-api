@@ -13,7 +13,8 @@ class TaskPolicy
      */
     public function viewAny(User $user): bool
     {
-        //
+        return $user->hasPermission('view-any-task');
+
     }
 
     /**
@@ -21,7 +22,8 @@ class TaskPolicy
      */
     public function view(User $user, Task $task): bool
     {
-        //
+        return $user->hasPermission('view-task');
+
     }
 
     /**
@@ -29,7 +31,8 @@ class TaskPolicy
      */
     public function create(User $user): bool
     {
-        //
+        return $user->hasPermission('create-task');
+
     }
 
     /**
@@ -37,7 +40,8 @@ class TaskPolicy
      */
     public function update(User $user, Task $task): bool
     {
-        //
+        return $user->hasPermission('update-task');
+
     }
 
     /**
@@ -45,7 +49,8 @@ class TaskPolicy
      */
     public function delete(User $user, Task $task): bool
     {
-        //
+        return $user->hasPermission('delete-task');
+
     }
 
     /**
@@ -53,7 +58,8 @@ class TaskPolicy
      */
     public function restore(User $user, Task $task): bool
     {
-        //
+        return $user->hasPermission('restore-task');
+
     }
 
     /**
@@ -61,6 +67,7 @@ class TaskPolicy
      */
     public function forceDelete(User $user, Task $task): bool
     {
-        //
+        return $user->hasPermission('force-delete-task');
+
     }
 }

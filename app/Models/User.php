@@ -3,14 +3,17 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, HasApiTokens;
 
     /**
@@ -40,6 +43,8 @@ class User extends Authenticatable
         'shoppingLists',
         'appointments',
         'goals',
+        'roles',
+        'permissions'
     ];
 
     /**
@@ -55,7 +60,7 @@ class User extends Authenticatable
         ];
     }
 
-    public function tasks()
+    public function tasks(): HasMany
     {
         return $this->hasMany(Task::class);
     }
@@ -63,7 +68,7 @@ class User extends Authenticatable
     /**
      * Get the shopping lists for the user.
      */
-    public function shoppingLists()
+    public function shoppingLists(): HasMany
     {
         return $this->hasMany(ShoppingList::class);
     }
@@ -71,7 +76,7 @@ class User extends Authenticatable
     /**
      * Get the appointments for the user.
      */
-    public function appointments()
+    public function appointments(): HasMany
     {
         return $this->hasMany(Appointment::class);
     }
@@ -79,40 +84,40 @@ class User extends Authenticatable
     /**
      * Get the goals for the user.
      */
-    public function goals()
+    public function goals(): HasMany
     {
         return $this->hasMany(Goal::class);
     }
 
-    /**
-     * Get the task permissions for the user.
-     */
-    public function taskPermissions()
+    public function roles(): BelongsToMany
     {
-        return $this->hasMany(TaskPermission::class);
+        return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id');
     }
 
-    /**
-     * Get the shopping list permissions for the user.
-     */
-    public function shoppingListPermissions()
+    public function permissions(): BelongsToMany
     {
-        return $this->hasMany(ShoppingListPermission::class);
+        return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id')
+        ->withTimestamps()->with('permissions');
+
     }
 
-    /**
-     * Get the appointment permissions for the user.
-     */
-    public function appointmentPermissions()
+    public function hasPermission($permission): bool
     {
-        return $this->hasMany(AppointmentPermission::class);
+        return $this->roles()->whereHas('permissions', function ($query) use ($permission) {
+            $query->where('name', $permission);
+        })->exists();
     }
 
-    /**
-     * Get the goal permissions for the user.
-     */
-    public function goalPermissions()
+
+    public function hasRole(string $role)
     {
-        return $this->hasMany(GoalPermission::class);
+        return $this->roles->contains('name', $role);
     }
+
+    public function assignRole(string $role)
+    {
+        $role = Role::where('name', $role)->firstOrFail();
+        $this->roles()->syncWithoutDetaching($role);
+    }
+
 }
