@@ -30,4 +30,11 @@ class ShoppingList extends Model
     {
         return $this->hasMany(ShoppingListItem::class);
     }
+
+    public function sharedWith()
+    {
+        return $this->belongsToMany(User::class, 'user_users', 'resource_id', 'granted_user_id')
+            ->where('resource_type', ShoppingList::class)
+            ->withPivot('permission_id');
+    }
 }

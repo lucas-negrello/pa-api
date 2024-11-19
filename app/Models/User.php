@@ -3,9 +3,10 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Traits\HasPermissions;
+use App\Traits\HasRoles;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -15,7 +16,7 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasFactory, Notifiable, HasApiTokens, HasRoles, HasPermissions;
 
     /**
      * The attributes that are mass assignable.
@@ -91,51 +92,10 @@ class User extends Authenticatable
         return $this->hasMany(Goal::class);
     }
 
-    public function roles(): BelongsToMany
-    {
-        return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id');
-    }
 
-    public function permissions(): BelongsToMany
-    {
-        return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id')
-        ->withTimestamps()->with('permissions');
-    }
-
-    // TODO - ESSA RELACAO ESTA RESULTANDO EM ALGO ESTRANHO (GERA UM SHARED ERRADO)
     public function sharedPermissions(): MorphMany
     {
         return $this->morphMany(UserUser::class, 'resource');
-    }
-
-    public function hasPermission($permission, $resource = null): bool
-    {
-        $hasGlobalPermission = $this->roles()->whereHas('permissions', function ($query) use ($permission) {
-            $query->where('name', $permission);
-        })->exists();
-
-        if($hasGlobalPermission){
-            return true;
-        }
-
-        if ($resource) {
-            return $this->sharedPermissions()
-                ->where('granted_user_id', $this->id)
-                ->where('resource_id', $resource->id)
-                ->where('resource_type', get_class($resource))
-                ->whereHas('permission', function ($query) use ($permission) {
-                    $query->where('name', $permission);
-                })
-                ->exists();
-        }
-
-        return false;
-    }
-
-
-    public function hasRole(string $role)
-    {
-        return $this->roles->contains('name', $role);
     }
 
 }

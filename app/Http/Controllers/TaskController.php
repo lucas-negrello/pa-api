@@ -16,9 +16,19 @@ class TaskController extends Controller
     public function index()
     {
         Gate::authorize('viewAny', Task::class);
+        $user = auth()->user();
 
-        $tasks = Task::all();
-        return response()->json($tasks);
+        $tasks = Task::where('user_id', $user->id)->get();
+
+        $sharedTasks = Task::whereHas('sharedWith', function ($query) use ($user) {
+            $query->where('granted_user_id', $user->id)
+                ->where('resource_type', Task::class);
+        })->get();
+
+        return response()->json([
+            'tasks' => $tasks,
+            'shared_tasks' => $sharedTasks
+        ]);
     }
 
     /**
@@ -40,7 +50,7 @@ class TaskController extends Controller
      */
     public function show(Task $task)
     {
-        Gate::authorize('view', Task::class);
+        Gate::authorize('view', $task);
 
         return response()->json([
             'message' => 'Task retrieved successfully',
@@ -53,7 +63,7 @@ class TaskController extends Controller
      */
     public function update(UpdateTaskRequest $request, Task $task)
     {
-        Gate::authorize('update', Task::class);
+        Gate::authorize('update', $task);
 
         $task->update($request->validated());
         return response()->json([
@@ -67,7 +77,7 @@ class TaskController extends Controller
      */
     public function destroy(Task $task)
     {
-        Gate::authorize('destroy', Task::class);
+        Gate::authorize('destroy', $task);
 
         $task->delete();
         return response()->json([

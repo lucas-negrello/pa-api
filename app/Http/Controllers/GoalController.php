@@ -16,9 +16,19 @@ class GoalController extends Controller
     public function index()
     {
         Gate::authorize('viewAny', Goal::class);
+        $user = auth()->user();
 
-        $goals = Goal::all();
-        return response()->json($goals);
+        $goals = Goal::where('user_id', $user->id)->get();
+
+        $sharedGoals = Goal::whereHas('sharedWith', function ($query) use ($user) {
+            $query->where('granted_user_id', $user->id)
+                ->where('resource_type', Goal::class);
+        })->get();
+
+        return response()->json([
+            'goals' => $goals,
+            'shared_goals' => $sharedGoals
+        ]);
     }
 
     /**
@@ -40,7 +50,7 @@ class GoalController extends Controller
      */
     public function show(Goal $goal)
     {
-        Gate::authorize('view', Goal::class);
+        Gate::authorize('view', $goal);
 
         return response()->json([
             'message' => 'Goal retrieved',
@@ -53,7 +63,7 @@ class GoalController extends Controller
      */
     public function update(UpdateGoalRequest $request, Goal $goal)
     {
-        Gate::authorize('update', Goal::class);
+        Gate::authorize('update', $goal);
 
         $goal->update($request->validated());
         return response()->json([
@@ -67,7 +77,7 @@ class GoalController extends Controller
      */
     public function destroy(Goal $goal)
     {
-        Gate::authorize('delete', Goal::class);
+        Gate::authorize('delete', $goal);
 
         $goal->delete();
         return response()->json([

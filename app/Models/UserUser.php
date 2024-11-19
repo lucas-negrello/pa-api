@@ -31,8 +31,6 @@ class UserUser extends Model
         return $this->belongsTo(Permission::class, 'permission_id');
     }
 
-    // TODO - VERIFICAR ESSE METODO TAMBEM (ESTRANHO)
-
     public function resource(): MorphTo
     {
         return $this->morphTo();

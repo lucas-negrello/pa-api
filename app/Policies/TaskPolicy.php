@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\Task;
 use App\Models\User;
+use App\Models\UserUser;
 use Illuminate\Auth\Access\Response;
 
 class TaskPolicy
@@ -13,7 +14,21 @@ class TaskPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermission('view-any-task');
+        if(Task::where('user_id', $user->id)->exists()){
+            return true;
+        }
+        $permission = UserUser::where('granted_user_id', $user->id)
+            ->where('resource_type', Task::class)
+            ->where('permission_id', function ($query) {
+                $query->select('id')
+                    ->from('permissions')
+                    ->where('name', 'view-any-task');
+            })
+            ->exists();
+
+        if ($permission) return true;
+
+        return false;
 
     }
 
@@ -22,7 +37,25 @@ class TaskPolicy
      */
     public function view(User $user, Task $task): bool
     {
-        return $user->hasPermission('view-task');
+        if($user->id === $task->user_id){
+            return true;
+        }
+
+        $permission = UserUser::where('granted_user_id', $user->id)
+            ->where('resource_type', Task::class)
+            ->where('resource_id', $task->id)
+            ->where('permission_id', function ($query) {
+                $query->select('id')
+                    ->from('permissions')
+                    ->where('name', 'view-task');
+            })
+            ->exists();
+
+        if ($permission) {
+            return true;
+        }
+
+        return false;
 
     }
 
@@ -40,7 +73,22 @@ class TaskPolicy
      */
     public function update(User $user, Task $task): bool
     {
-        return $user->hasPermission('update-task');
+        if($user->id === $task->user_id){
+            return true;
+        }
+        $permission = UserUser::where('granted_user_id', $user->id)
+            ->where('resource_type', Task::class)
+            ->where('resource_id', $task->id)
+            ->where('permission_id', function ($query) {
+                $query->select('id')
+                    ->from('permissions')
+                    ->where('name', 'update-task');
+            })
+            ->exists();
+
+        if ($permission) return true;
+
+        return false;
 
     }
 
@@ -49,7 +97,23 @@ class TaskPolicy
      */
     public function delete(User $user, Task $task): bool
     {
-        return $user->hasPermission('delete-task');
+        if($user->id === $task->user_id){
+            return true;
+        }
+        $permission = UserUser::where('granted_user_id', $user->id)
+            ->where('resource_type', Task::class)
+            ->where('resource_id', $task->id)
+            ->where('permission_id', function ($query) {
+                $query->select('id')
+                    ->from('permissions')
+                    ->where('name', 'delete-task');
+            })
+            ->exists();
+
+        if ($permission) return true;
+
+        return false;
+
 
     }
 

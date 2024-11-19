@@ -16,9 +16,19 @@ class ShoppingListController extends Controller
     public function index()
     {
         Gate::authorize('viewAny', ShoppingList::class);
+        $user = auth()->user();
 
-        $shoppingLists = ShoppingList::all();
-        return response()->json($shoppingLists);
+        $shoppingLists = ShoppingList::where('user_id', $user->id)->get();
+
+        $sharedShoppingLists = ShoppingList::whereHas('sharedWith', function ($query) use ($user) {
+            $query->where('granted_user_id', $user->id)
+                ->where('resource_type', ShoppingList::class);
+        })->get();
+
+        return response()->json([
+            'shoppingLists' => $shoppingLists,
+            'shared_shoppingLists' => $sharedShoppingLists
+        ]);
     }
 
     /**
@@ -40,7 +50,7 @@ class ShoppingListController extends Controller
      */
     public function show(ShoppingList $shoppingList)
     {
-        Gate::authorize('view', ShoppingList::class);
+        Gate::authorize('view', $shoppingList);
 
         return response()->json([
             'message' => 'Successfully found a shopping list',
@@ -53,7 +63,7 @@ class ShoppingListController extends Controller
      */
     public function update(UpdateShoppingListRequest $request, ShoppingList $shoppingList)
     {
-        Gate::authorize('update', ShoppingList::class);
+        Gate::authorize('update', $shoppingList);
 
         $shoppingList->update($request->validated());
         return response()->json([
@@ -67,7 +77,7 @@ class ShoppingListController extends Controller
      */
     public function destroy(ShoppingList $shoppingList)
     {
-        Gate::authorize('delete', ShoppingList::class);
+        Gate::authorize('delete', $shoppingList);
 
         $shoppingList->delete();
         return response()->json([

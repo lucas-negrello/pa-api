@@ -4,12 +4,15 @@ use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\GoalController;
+use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ResetPasswordController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ShoppingListController;
 use App\Http\Controllers\ShoppingListItemController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\VerificationController;
 use \App\Http\Controllers\HandlePermissions;
+use App\Http\Middleware\CheckPassword;
 use App\Http\Middleware\LogLoginAttempts;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -49,9 +52,23 @@ Route::prefix('v1')->group(function () {
         Route::resource('/shoppingListItems', ShoppingListItemController::class)->parameter('','shoppingListItem');
         Route::resource('/tasks', TaskController::class)->parameter('','task');
 
-        // PERMISSION ROUTES
-        Route::post('/permission/give/{user_id}/{granted_user_id}', [HandlePermissions::class, 'grantPermissionsToAnotherUser']);
+        // SHARED PERMISSION ROUTES
+        Route::post('/permission/give', [HandlePermissions::class, 'grantPermissionsToAnotherUser']);
+        Route::delete('/permission/revoke', [HandlePermissions::class, 'removePermissionsFromAnotherUser']);
+        Route::get('/permissions/all', [HandlePermissions::class, 'getAllPermissionsFromUser']);
+
+
     });
+
+    Route::middleware(CheckPassword::class)->group(function () {
+        // ROUTES FOR ROLES AND PERMISSIONS CONTROL
+        Route::post('/roles/assign',[RoleController::class, 'attachRole']);
+        Route::post('/roles/detach',[RoleController::class, 'detachRole']);
+        Route::post('/permissions/assign',[PermissionController::class, 'attachPermission']);
+        Route::post('/permissions/detach',[PermissionController::class, 'detachPermission']);
+    });
+
+
 });
 
 

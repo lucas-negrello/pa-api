@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\ShoppingList;
 use App\Models\User;
+use App\Models\UserUser;
 use Illuminate\Auth\Access\Response;
 
 class ShoppingListPolicy
@@ -13,7 +14,21 @@ class ShoppingListPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermission('view-any-shopping-list');
+        if(ShoppingList::where('user_id', $user->id)->exists()){
+            return true;
+        }
+        $permission = UserUser::where('granted_user_id', $user->id)
+            ->where('resource_type', ShoppingList::class)
+            ->where('permission_id', function ($query) {
+                $query->select('id')
+                    ->from('permissions')
+                    ->where('name', 'view-any-shopping-list');
+            })
+            ->exists();
+
+        if ($permission) return true;
+
+        return false;
 
     }
 
@@ -22,7 +37,25 @@ class ShoppingListPolicy
      */
     public function view(User $user, ShoppingList $shoppingList): bool
     {
-        return $user->hasPermission('view-shopping-list');
+        if($user->id === $shoppingList->user_id){
+            return true;
+        }
+
+        $permission = UserUser::where('granted_user_id', $user->id)
+            ->where('resource_type', ShoppingList::class)
+            ->where('resource_id', $shoppingList->id)
+            ->where('permission_id', function ($query) {
+                $query->select('id')
+                    ->from('permissions')
+                    ->where('name', 'view-shopping-list');
+            })
+            ->exists();
+
+        if ($permission) {
+            return true;
+        }
+
+        return false;
 
     }
 
@@ -40,7 +73,22 @@ class ShoppingListPolicy
      */
     public function update(User $user, ShoppingList $shoppingList): bool
     {
-        return $user->hasPermission('update-shopping-list');
+        if($user->id === $shoppingList->user_id){
+            return true;
+        }
+        $permission = UserUser::where('granted_user_id', $user->id)
+            ->where('resource_type', ShoppingList::class)
+            ->where('resource_id', $shoppingList->id)
+            ->where('permission_id', function ($query) {
+                $query->select('id')
+                    ->from('permissions')
+                    ->where('name', 'update-shopping-list');
+            })
+            ->exists();
+
+        if ($permission) return true;
+
+        return false;
 
     }
 
@@ -49,7 +97,22 @@ class ShoppingListPolicy
      */
     public function delete(User $user, ShoppingList $shoppingList): bool
     {
-        return $user->hasPermission('delete-shopping-list');
+        if($user->id === $shoppingList->user_id){
+            return true;
+        }
+        $permission = UserUser::where('granted_user_id', $user->id)
+            ->where('resource_type', ShoppingList::class)
+            ->where('resource_id', $shoppingList->id)
+            ->where('permission_id', function ($query) {
+                $query->select('id')
+                    ->from('permissions')
+                    ->where('name', 'delete-shopping-list');
+            })
+            ->exists();
+
+        if ($permission) return true;
+
+        return false;
 
     }
 
