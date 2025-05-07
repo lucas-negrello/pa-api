@@ -4,7 +4,7 @@ namespace App\Policies;
 
 use App\Models\Appointment;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
+use App\Models\UserUser;
 
 class AppointmentPolicy
 {
@@ -13,7 +13,21 @@ class AppointmentPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermission('view-any-appointment');
+        if(Appointment::where('user_id', $user->id)->exists()){
+            return true;
+        }
+        $permission = UserUser::where('granted_user_id', $user->id)
+            ->where('resource_type', Appointment::class)
+            ->where('permission_id', function ($query) {
+                $query->select('id')
+                    ->from('permissions')
+                    ->where('name', 'view-any-appointment');
+            })
+            ->exists();
+
+        if ($permission) return true;
+
+        return false;
 
     }
 
@@ -22,8 +36,25 @@ class AppointmentPolicy
      */
     public function view(User $user, Appointment $appointment): bool
     {
-        return $user->hasPermission('view-appointment');
+        if($user->id === $appointment->user_id){
+            return true;
+        }
 
+        $permission = UserUser::where('granted_user_id', $user->id)
+            ->where('resource_type', Appointment::class)
+            ->where('resource_id', $appointment->id)
+            ->where('permission_id', function ($query) {
+                $query->select('id')
+                    ->from('permissions')
+                    ->where('name', 'view-appointment');
+            })
+            ->exists();
+
+        if ($permission) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -40,7 +71,23 @@ class AppointmentPolicy
      */
     public function update(User $user, Appointment $appointment): bool
     {
-        return $user->hasPermission('update-appointment');
+
+        if($user->id === $appointment->user_id){
+            return true;
+        }
+        $permission = UserUser::where('granted_user_id', $user->id)
+            ->where('resource_type', Appointment::class)
+            ->where('resource_id', $appointment->id)
+            ->where('permission_id', function ($query) {
+                $query->select('id')
+                    ->from('permissions')
+                    ->where('name', 'update-appointment');
+            })
+            ->exists();
+
+        if ($permission) return true;
+
+        return false;
 
     }
 
@@ -49,7 +96,22 @@ class AppointmentPolicy
      */
     public function delete(User $user, Appointment $appointment): bool
     {
-        return $user->hasPermission('delete-appointment');
+        if($user->id === $appointment->user_id){
+            return true;
+        }
+        $permission = UserUser::where('granted_user_id', $user->id)
+            ->where('resource_type', Appointment::class)
+            ->where('resource_id', $appointment->id)
+            ->where('permission_id', function ($query) {
+                $query->select('id')
+                    ->from('permissions')
+                    ->where('name', 'delete-appointment');
+            })
+            ->exists();
+
+        if ($permission) return true;
+
+        return false;
 
     }
 

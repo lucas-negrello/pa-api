@@ -5,14 +5,16 @@ return [
     'documentations' => [
         'default' => [
             'api' => [
-                'title' => 'L5 Swagger UI',
+                'title' => 'Personal Assistant API Documentation',
+                'description' => 'API for managing day-to-day things with facility',
+                'version' => '1.0.0'
             ],
 
             'routes' => [
                 /*
                  * Route for accessing api documentation interface
                  */
-                'api' => 'api/documentation',
+                'api' => 'api/v1/documentation',
             ],
             'paths' => [
                 /*
@@ -44,7 +46,7 @@ return [
                  * Absolute paths to directory containing the swagger annotations are stored.
                  */
                 'annotations' => [
-                    base_path('app'),
+                    base_path('app/Swagger'),
                 ],
             ],
         ],
@@ -78,6 +80,7 @@ return [
         ],
 
         'paths' => [
+            'annotations' => base_path('app/Swagger'),
             /*
              * Absolute path to location where parsed annotations will be stored
              */

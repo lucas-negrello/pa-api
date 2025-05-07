@@ -3,10 +3,12 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Traits\HasPermissions;
+use App\Traits\HasRoles;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -14,7 +16,7 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasFactory, Notifiable, HasApiTokens, HasRoles, HasPermissions;
 
     /**
      * The attributes that are mass assignable.
@@ -44,7 +46,8 @@ class User extends Authenticatable
         'appointments',
         'goals',
         'roles',
-        'permissions'
+        'permissions',
+        'sharedPermissions'
     ];
 
     /**
@@ -89,35 +92,10 @@ class User extends Authenticatable
         return $this->hasMany(Goal::class);
     }
 
-    public function roles(): BelongsToMany
+
+    public function sharedPermissions(): MorphMany
     {
-        return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id');
-    }
-
-    public function permissions(): BelongsToMany
-    {
-        return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id')
-        ->withTimestamps()->with('permissions');
-
-    }
-
-    public function hasPermission($permission): bool
-    {
-        return $this->roles()->whereHas('permissions', function ($query) use ($permission) {
-            $query->where('name', $permission);
-        })->exists();
-    }
-
-
-    public function hasRole(string $role)
-    {
-        return $this->roles->contains('name', $role);
-    }
-
-    public function assignRole(string $role)
-    {
-        $role = Role::where('name', $role)->firstOrFail();
-        $this->roles()->syncWithoutDetaching($role);
+        return $this->morphMany(UserUser::class, 'resource');
     }
 
 }

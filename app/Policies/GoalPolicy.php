@@ -4,7 +4,7 @@ namespace App\Policies;
 
 use App\Models\Goal;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
+use App\Models\UserUser;
 
 class GoalPolicy
 {
@@ -13,7 +13,21 @@ class GoalPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermission('view-any-goal');
+        if(Goal::where('user_id', $user->id)->exists()){
+            return true;
+        }
+        $permission = UserUser::where('granted_user_id', $user->id)
+            ->where('resource_type', Goal::class)
+            ->where('permission_id', function ($query) {
+                $query->select('id')
+                    ->from('permissions')
+                    ->where('name', 'view-any-goal');
+            })
+            ->exists();
+
+        if ($permission) return true;
+
+        return false;
 
     }
 
@@ -22,7 +36,25 @@ class GoalPolicy
      */
     public function view(User $user, Goal $goal): bool
     {
-        return $user->hasPermission('view-goal');
+        if($user->id === $goal->user_id){
+            return true;
+        }
+
+        $permission = UserUser::where('granted_user_id', $user->id)
+        ->where('resource_type', Goal::class)
+        ->where('resource_id', $goal->id)
+        ->where('permission_id', function ($query) {
+            $query->select('id')
+                ->from('permissions')
+                ->where('name', 'view-goal');
+        })
+            ->exists();
+
+        if ($permission) {
+            return true;
+        }
+
+        return false;
 
     }
 
@@ -31,6 +63,7 @@ class GoalPolicy
      */
     public function create(User $user): bool
     {
+
         return $user->hasPermission('create-goal');
 
     }
@@ -40,7 +73,23 @@ class GoalPolicy
      */
     public function update(User $user, Goal $goal): bool
     {
-        return $user->hasPermission('update-goal');
+
+        if($user->id === $goal->user_id){
+            return true;
+        }
+        $permission = UserUser::where('granted_user_id', $user->id)
+            ->where('resource_type', Goal::class)
+            ->where('resource_id', $goal->id)
+            ->where('permission_id', function ($query) {
+                $query->select('id')
+                    ->from('permissions')
+                    ->where('name', 'update-goal');
+            })
+            ->exists();
+
+        if ($permission) return true;
+
+        return false;
 
     }
 
@@ -49,7 +98,22 @@ class GoalPolicy
      */
     public function delete(User $user, Goal $goal): bool
     {
-        return $user->hasPermission('delete-goal');
+        if($user->id === $goal->user_id){
+            return true;
+        }
+        $permission = UserUser::where('granted_user_id', $user->id)
+            ->where('resource_type', Goal::class)
+            ->where('resource_id', $goal->id)
+            ->where('permission_id', function ($query) {
+                $query->select('id')
+                    ->from('permissions')
+                    ->where('name', 'delete-goal');
+            })
+            ->exists();
+
+        if ($permission) return true;
+
+        return false;
 
     }
 

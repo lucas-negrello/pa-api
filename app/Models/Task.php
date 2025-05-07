@@ -23,5 +23,11 @@ class Task extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function sharedWith()
+    {
+        return $this->belongsToMany(User::class, 'user_users', 'resource_id', 'granted_user_id')
+            ->where('resource_type', Task::class)
+            ->withPivot('permission_id');
+    }
 
 }

@@ -17,8 +17,19 @@ class AppointmentController extends Controller
     {
         Gate::authorize('viewAny', Appointment::class);
 
-        $appointments = Appointment::all();
-        return response()->json($appointments);
+        $user = auth()->user();
+
+        $appointments = Appointment::where('user_id', $user->id)->get();
+
+        $sharedAppointments = Appointment::whereHas('sharedWith', function ($query) use ($user) {
+            $query->where('granted_user_id', $user->id)
+                ->where('resource_type', Appointment::class);
+        })->get();
+
+        return response()->json([
+            'appointments' => $appointments,
+            'shared_appointments' => $sharedAppointments
+        ]);
     }
 
     /**
@@ -40,7 +51,7 @@ class AppointmentController extends Controller
      */
     public function show(Appointment $appointment)
     {
-        Gate::authorize('view', Appointment::class);
+        Gate::authorize('view', $appointment);
 
         return response()->json([
             'message' => 'Appointment retrieved successfully',
@@ -53,6 +64,8 @@ class AppointmentController extends Controller
      */
     public function update(UpdateAppointmentRequest $request, Appointment $appointment)
     {
+        Gate::authorize('update', $appointment);
+
         $appointment->update($request->validated());
         return response()->json([
             'message' => 'Appointment updated successfully',
@@ -65,6 +78,8 @@ class AppointmentController extends Controller
      */
     public function destroy(Appointment $appointment)
     {
+        Gate::authorize('delete', $appointment);
+
         $appointment->delete();
         return response()->json([
             'message' => 'Appointment deleted successfully',
